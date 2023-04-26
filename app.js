@@ -1,8 +1,10 @@
 //jshint esversion:6
+require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require('mongoose');
+const md5=require("md5");
 
 
 
@@ -39,7 +41,7 @@ app.get("/register",function(req,res){
 app.post("/register",function(req,res){
     const newUser= new User({
         email:req.body.username,
-        password:req.body.password
+        password:md5(req.body.password)
 
     })
 
@@ -59,7 +61,7 @@ newUser.save()
 
 app.post("/login",function(req,res){
     const username= req.body.username;
-const password= req.body.password;
+const password= md5(req.body.password);
     
 User.findOne({email:username})
 .catch(function(err){
