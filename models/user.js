@@ -1,7 +1,10 @@
 require("dotenv").config();
 const mongoose= require("mongoose");
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
+const session= require ("express-session");
+const passport= require("passport");
+const passportLocalMongoose=require("passport-local-mongoose");
+
+
 
 
 
@@ -10,7 +13,7 @@ const userSchema =new mongoose.Schema( {
     password: String
   });
 
-
+userSchema.plugin(passportLocalMongoose);
  
   
   
