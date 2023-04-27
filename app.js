@@ -42,6 +42,7 @@ mongoose.connect("mongodb://0.0.0.0:27017/userDB", {useNewUrlParser: true,useUni
 const User= require("./models/user");
 
 passport.use(User.createStrategy());
+
 passport.serializeUser(function(user, cb) {
     process.nextTick(function() {
       cb(null, { id: user.id, username: user.username });
@@ -94,14 +95,45 @@ app.get("/register",function(req,res){
 });
 
 app.get("/secrets",function(req,res){
-    if(req.isAuthenticated()){
-        res.render("secrets");
-    }
-    else{
-        res.redirect("/login");
-    }
-})
+   User.find({"secret":{$ne:null}})
+   .catch(function(err){
+    console.log(err);
+  
+   })
+.then(function(foundUser){
+  res.render("secrets",{userWithSecrets:foundUser});
+});
 
+});
+
+app.get("/submit",function(req,res){
+  if(req.isAuthenticated()){
+    res.render("submit");
+}
+else{
+    res.redirect("/login");
+}
+});
+
+app.post("/submit",function(req,res){
+  const submittedSecret=req.body.secret;
+  // console.log(req.user.id);
+
+  User.findById(req.user.id)
+  .catch(function(err){
+    console.log(err);
+  })
+  .then(function(foundUser){
+    if(foundUser){
+      foundUser.secret=submittedSecret;
+      foundUser.save()
+      .then(function(){
+        res.redirect("/secrets");
+      });
+    }
+  });
+
+})
 
 
 app.get('/logout', function(req, res, next) {
